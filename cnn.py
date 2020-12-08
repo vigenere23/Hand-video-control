@@ -9,19 +9,24 @@ class Net(nn.Module):
         super().__init__()
 
         self.cnn_layers = nn.Sequential(
-            nn.Conv2d(1, 4, kernel_size = 3, stride = 1, padding = 1),
-            nn.BatchNorm2d(4),
+            nn.Conv2d(1, 8, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(8),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size = 2, stride = 2),
-            ###
-            nn.Conv2d(4, 4, kernel_size = 3, stride = 1, padding = 1),
-            nn.BatchNorm2d(4),
-            nn.ReLU(inplace = True),
-            nn.MaxPool2d(kernel_size = 2, stride = 2)
+            nn.Conv2d(8, 16, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size = 2),
+            nn.Conv2d(16, 32, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 64, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size = 2)
         )
 
         self.linear_layers = nn.Sequential(
-            nn.Linear(4*7*7, int(nb_classes))
+            nn.Linear(64 * 7*7, int(nb_classes))
         )
     
     def forward(self,x):
@@ -48,9 +53,7 @@ class GoogleNet(nn.Module):
         return self.model.forward(x)
 
 
-def load_model(model_class: object, timestamp: str):
-  model_name = model_class.__name__
-  path = f"models/{model_name}_{timestamp}.plt"
+def load_model(path: str):
   data = torch.load(path)
 
   model = data['model']
@@ -67,7 +70,8 @@ def load_model(model_class: object, timestamp: str):
 def save_model(model: nn.Module = None, optimizer: optim.Optimizer = None, criterion: nn.Module = None, test_accuracy: float = None):
   model_name = model.__class__.__name__
   timestamp = time.time()
-  path = f"models/{model_name}_{timestamp}.plt"
+  test_accuracy = round(test_accuracy, 4)
+  path = f"models/{test_accuracy}_{model_name}_{timestamp}.plt"
 
   data = {
     'model': model,

@@ -156,8 +156,8 @@ def train(model: nn.Module, n_epochs: int, batch_size: int, optimizer: optim.Opt
     test_accuracies = []
     model_to_save = {}
 
-    train_gen = DataLoader(train_dataset, batch_size, True)
-    test_gen = DataLoader(test_dataset, batch_size, True)
+    train_gen = DataLoader(train_dataset, batch_size, shuffle=True)
+    test_gen = DataLoader(test_dataset, batch_size, shuffle=False)
 
     for epoch_number in range(n_epochs):
         train_loss_sum = 0
@@ -171,7 +171,7 @@ def train(model: nn.Module, n_epochs: int, batch_size: int, optimizer: optim.Opt
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 
-        if (model_to_save.get('accuracy', 0) < test_accuracy):
+        if (model_to_save.get('test_accuracy', 0) < test_accuracy):
             model_to_save = {
                 'model': model,
                 'optimizer': optimizer,
@@ -189,9 +189,9 @@ def train(model: nn.Module, n_epochs: int, batch_size: int, optimizer: optim.Opt
 
 def run():
     # Parameters
-    n_epochs = 2
-    batch_size = pow(2, 10)
-    lr = 0.0003
+    n_epochs = 30
+    batch_size = pow(2, 9)
+    lr = 0.0002
 
     # Loading dataset
     train_dataset = SignLanguageDataset("train")

@@ -1,6 +1,4 @@
 .venv/
 archive/
-
 **/__pycache__/
-
-**/*.plt
+data/*.plt
