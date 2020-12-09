@@ -9,7 +9,7 @@ from image import images_to_tensor, creating_images_array
 from analyzing import test_realworld_images
 import cv2
 import os
-from tqdm import tqdm
+from barbar import Bar
 
 
 def load_csv_dataset(csv_path: str):
@@ -72,10 +72,12 @@ def split_dataset(dataset: Dataset, factor: float = 0.5):
     return random_split(dataset, [first_dataset_length, second_dataset_length])
 
 
-def train_epoch(model: nn.Module, train_gen: DataLoader, val_gen: DataLoader, optimizer: optim.Optimizer, criterion: nn.Module, scheduler: object = None):
+def train_epoch(model: nn.Module, train_gen: DataLoader, val_gen: DataLoader, optimizer: optim.Optimizer, criterion: nn.Module, scheduler: object = None, verbose: bool = False):
     losses = []
     accuracies = []
     model.train()
+
+    train_gen = Bar(train_gen) if verbose else train_gen
 
     for batch, (images, target) in enumerate(train_gen):
         if torch.cuda.is_available():
@@ -92,8 +94,10 @@ def train_epoch(model: nn.Module, train_gen: DataLoader, val_gen: DataLoader, op
 
         # print("Batch: ", batch, "\t", "loss: ", loss.item())
 
+    val_gen = Bar(val_gen) if verbose else val_gen
     with torch.no_grad():
-        for batch, (images, target) in enumerate(val_gen):
+
+        for images, target in val_gen:
             if torch.cuda.is_available():
                 images = images.cuda()
                 target = target.cuda()
@@ -112,7 +116,7 @@ def train_epoch(model: nn.Module, train_gen: DataLoader, val_gen: DataLoader, op
     if scheduler is not None:
         scheduler.step(epoch_loss)
 
-    print("VAL", "\t", "loss: ", epoch_loss, "\t", "accuracy: ", epoch_accuracy)
+    print("\nVAL", "\t", "loss: ", epoch_loss, "\t", "accuracy: ", epoch_accuracy)
 
     return epoch_loss, epoch_accuracy
 
@@ -123,7 +127,7 @@ def test_epoch(model: nn.Module, test_gen: DataLoader, criterion: nn.Module):
     model.eval()
 
     with torch.no_grad():
-        for images, target in tqdm(test_gen):
+        for images, target in test_gen:
             if torch.cuda.is_available():
                 images = images.cuda()
                 target = target.cuda()
@@ -143,7 +147,7 @@ def test_epoch(model: nn.Module, test_gen: DataLoader, criterion: nn.Module):
     return epoch_loss, epoch_accuracy
 
 
-def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_dataset: Dataset, n_epochs: int, batch_size: int, optimizer: optim.Optimizer, criterion: nn.Module, scheduler: object = None):
+def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_dataset: Dataset, n_epochs: int, batch_size: int, optimizer: optim.Optimizer, criterion: nn.Module, scheduler: object = None, verbose: bool = False):
     train_losses = []
     test_losses = []
     train_accuracies = []
@@ -162,7 +166,7 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
         train_loss_sum = 0
         print(f"\n------ EPOCH {epoch_number} ------\n")
 
-        train_loss, train_accuracy = train_epoch(model, train_gen, val_gen, optimizer, criterion, scheduler=scheduler)
+        train_loss, train_accuracy = train_epoch(model, train_gen, val_gen, optimizer, criterion, scheduler=scheduler, verbose=verbose)
         test_loss, test_accuracy = test_epoch(model, test_gen, criterion)
         
         train_losses.append(train_loss)
@@ -170,7 +174,8 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
         train_accuracies.append(train_accuracy)
         test_accuracies.append(test_accuracy)
 
-        test_realworld_images(model)
+        if verbose:
+            test_realworld_images(model)
 
         if (model_to_save.get('test_accuracy', 0) < test_accuracy):
             model_to_save = {
@@ -211,7 +216,7 @@ def run():
     criterion = nn.CrossEntropyLoss()
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=2, min_lr=0.00001, verbose=True)
 
-    train(model, train_dataset, val_dataset, test_dataset, n_epochs, batch_size, optimizer, criterion, scheduler=scheduler)
+    train(model, train_dataset, val_dataset, test_dataset, n_epochs, batch_size, optimizer, criterion, scheduler=scheduler, verbose=True)
 
 
 
