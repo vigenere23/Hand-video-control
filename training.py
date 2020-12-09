@@ -1,51 +1,17 @@
 import pandas as pd
 import numpy as np
-
-import cv2
-from tqdm import tqdm
-
 import torch
 from torch import nn, optim
 from torch.utils.data import Dataset, DataLoader
-
+from torchvision import transforms
 from cnn import Net, GoogleNet, save_model, load_model
-
-
-def creating_images_save(data):
-    number_pictures = data.shape[0]
-    for i in tqdm(range(number_pictures)):
-        img = np.zeros((28,28))
-        compte = 1
-        for line in range(28):
-            for column in range(28):
-                img[line, column] = int(data["pixel"+str(compte)][i])
-                compte += 1
-        cv2.imwrite("archive/sign_mnist_test/test" + str(i) + ".png", img)
-    return
-
-
-def creating_images_array(data):
-    train_img = []
-    number_pictures = data.shape[0]
-    for i in tqdm(range(number_pictures)):
-        img = np.zeros((28,28))
-        compte = 1
-        for line in range(28):
-            for column in range(28):
-                img[line, column] = int(data["pixel"+str(compte)][i])
-                compte += 1
-        img /= 255.0
-        img = img.astype("float32")
-        train_img.append(img)
-    return train_img
+from image import images_to_tensor, creating_images_array
 
 
 def load_csv_dataset(csv_path: str):
     dataset = pd.read_csv(csv_path)
 
-    images = np.array(creating_images_array(dataset))
-    images = images.reshape(int(images.shape[0]), 1, 28, 28)
-    images = torch.from_numpy(images)
+    images = images_to_tensor(creating_images_array(dataset))
 
     target = dataset['label'].values.astype(int)
     target = torch.from_numpy(target)
@@ -73,6 +39,10 @@ def load_dataset(dataset_type: str):
 class SignLanguageDataset():
     def __init__(self, dataset_type: str):
         self.__images, self.__target = load_dataset(dataset_type)
+        self.transform = nn.Sequential(
+            transforms.RandomResizedCrop((28, 28), scale=(0.9, 1.1), ratio=(9./10., 10./9.)),
+            transforms.RandomRotation(10)
+        )
 
     def __len__(self):
         return self.__target.shape[0]
@@ -190,8 +160,8 @@ def train(model: nn.Module, n_epochs: int, batch_size: int, optimizer: optim.Opt
 def run():
     # Parameters
     n_epochs = 30
-    batch_size = pow(2, 9)
-    lr = 0.0002
+    batch_size = 128
+    lr = 0.0003
 
     # Loading dataset
     train_dataset = SignLanguageDataset("train")
