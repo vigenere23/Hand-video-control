@@ -7,30 +7,83 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-def test_realworld_images(model: nn.Module):
+LETTER_GROUPS = {
+    'round': ['A', 'E', 'M', 'N', 'O', 'S', 'T'],
+    'pointing': ['D', 'I', 'K', 'R', 'U', 'X'],
+    'double_pointing': ['L', 'V'],
+    'triple_pointing': ['F', 'W'],
+    'pointing_down': ['P', 'Q'],
+    'opened': ['B', 'C', 'E']
+}
+
+
+def is_close_to_letter(predicted: str, truth: str) -> bool:
+    for group in LETTER_GROUPS.values():
+        if (truth in group) and (predicted in group):
+            return True
+
+    return False
+
+
+def predict_sign(model: nn.Module, image: np.ndarray) -> str:
     if torch.cuda.is_available():
         model = model.cuda()
 
     model.eval()
-    letters = ['A', 'L', 'Q']
 
-    for letter in letters:
-        img = cv2.imread(f"test_images/{letter}.jpg")
-        img = bgr_image_to_tensor(img)
+    image = cv2.resize(image, (28, 28))
+    image = bgr_image_to_tensor(image)
 
-        img = img.cuda()
+    if torch.cuda.is_available():
+        image = image.cuda()
 
-        sign_index = model(img).argmax(dim=1).item()
-        sign = chr(65 + sign_index)
+    predicted_index = model(image).argmax(dim=1).item()
+    predicted_letter = chr(65 + predicted_index)
 
-        if sign == letter:
-            print(f"I'm genius, I know that a {sign} is a {letter}")
+    return predicted_letter
+
+
+def test_realworld_images(model: nn.Module):
+    results = {
+        'exact': set(),
+        'close': set(),
+        'wrong': set()
+    }
+    percentages = []
+    predictions = []
+
+    LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+
+    for letter in LETTERS:
+        image = cv2.imread(f"test_images/{letter}.jpg")
+        predicted_letter = predict_sign(model, image)
+        predictions.append(predicted_letter)
+
+        if predicted_letter == letter:
+            results['exact'].add(letter)
+        elif is_close_to_letter(predicted_letter, letter):
+            results['close'].add(letter)
         else:
-            print(f"I'm dumb, I think that a {letter} is a {sign}")
+            results['wrong'].add(letter)
+
+    print()
+
+    for result_type, letters in results.items():
+        percentage = round(float(len(letters)) / float(len(LETTERS)) * 100, 1)
+        percentages.append(percentage)
+        print(f"{result_type} ({percentage}%):\t{', '.join(letters)}")
+
+    print()
+
+    predictions.sort()
+    print(f"predictions:\t{', '.join(predictions)}")
+    print(f"unique pred.:\t{', '.join(set(predictions))}")
+
+    return percentages
 
 
 def run():
-    model, *_ = load_model('1.0_Net_1607547806.270809')
+    model, *_ = load_model('1.0_Net_1607550837.585151')
     test_realworld_images(model)
 
 
