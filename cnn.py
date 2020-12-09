@@ -76,11 +76,11 @@ def save_model(model: nn.Module = None, optimizer: optim.Optimizer = None, crite
     path = f"models/{test_accuracy}_{model_name}_{timestamp}.plt"
 
     data = {
-        'model': model,
+        'model': model.cpu(),
         'model_state': model.state_dict(),
         'optimizer': optimizer,
         'optimizer_state': optimizer.state_dict(),
-        'criterion': criterion,
+        'criterion': criterion.cpu(),
         'criterion_state': criterion.state_dict(),
         'test_accuracy': test_accuracy
     }
