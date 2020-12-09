@@ -8,6 +8,8 @@ from cnn import Net, GoogleNet, save_model, load_model
 from image import images_to_tensor, creating_images_array
 from analyzing import test_realworld_images
 import cv2
+import os
+from tqdm import tqdm
 
 
 def load_csv_dataset(csv_path: str):
@@ -24,14 +26,14 @@ def load_csv_dataset(csv_path: str):
 def load_dataset(dataset_type: str):
     images = None
     target = None
-    path = f"data/{dataset_type}.plt"
+    path = os.path.join("data", f"{dataset_type}.plt")
 
     try:
         images, target = torch.load(path)
     except Exception as e:
         print(e)
         print("Loading from csv... this might take a while")
-        csv_path = f"archive/sign_mnist_{dataset_type}/sign_mnist_{dataset_type}.csv"
+        csv_path = os.path.join("data", f"sign_mnist_{dataset_type}.csv")
         images, target = load_csv_dataset(csv_path)
         torch.save([images, target], path)
 
@@ -121,7 +123,7 @@ def test_epoch(model: nn.Module, test_gen: DataLoader, criterion: nn.Module):
     model.eval()
 
     with torch.no_grad():
-        for images, target in test_gen:
+        for images, target in tqdm(test_gen):
             if torch.cuda.is_available():
                 images = images.cuda()
                 target = target.cuda()

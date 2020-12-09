@@ -5,7 +5,7 @@
 ### Dataset
 
 1. Download CSV datasets from https://www.kaggle.com/datamunge/sign-language-mnist.
-2. Extract them as is inside the prcject's root folder.
+2. Extract and put the CSVs inside `/data`.
 
 > These CSVs will only be used in the first run. They will then be converted to binaries for faster reuse.
 

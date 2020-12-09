@@ -13,7 +13,7 @@ def creating_images_save(data):
             for column in range(28):
                 img[line, column] = int(data["pixel"+str(compte)][i])
                 compte += 1
-            cv2.imwrite("archive/sign_mnist_test/test" + str(i) + ".png", img)
+            cv2.imwrite("data/sign_mnist_test/test" + str(i) + ".png", img)
     return
 
 
