@@ -2,7 +2,7 @@ import cv2
 import torch
 from torch import nn
 from cnn import load_model
-from image import bgr_image_to_tensor
+from image import normalize_image_input, get_square_boudaries
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -30,9 +30,7 @@ def predict_sign(model: nn.Module, image: np.ndarray) -> str:
         model = model.cuda()
 
     model.eval()
-
-    image = cv2.resize(image, (28, 28))
-    image = bgr_image_to_tensor(image)
+    image = normalize_image_input(image)
 
     if torch.cuda.is_available():
         image = image.cuda()
@@ -56,7 +54,11 @@ def test_realworld_images(model: nn.Module):
 
     for letter in LETTERS:
         image = cv2.imread(f"test_images/{letter}.jpg")
-        image = image[15:85, 15:85]
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, binary_image = cv2.threshold(image, 250, 255, cv2.THRESH_BINARY_INV)
+        x1, x2, y1, y2 = get_square_boudaries(binary_image, margins_percentage=0.1)
+        image = image[y1:y2, x1:x2]
+
         predicted_letter = predict_sign(model, image)
         predictions.append(predicted_letter)
 

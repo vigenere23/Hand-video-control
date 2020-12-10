@@ -8,7 +8,7 @@ class Net(nn.Module):
     def __init__(self, nb_classes):
         super().__init__()
 
-        self.cnn_layers = nn.Sequential(
+        self.model = nn.Sequential(
             nn.Conv2d(1, 64, kernel_size = 3, padding = 1),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(64),
@@ -21,21 +21,26 @@ class Net(nn.Module):
             nn.Conv2d(32, 16, kernel_size = 3, padding = 1),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(16),
-            nn.MaxPool2d(kernel_size = 2)
-        )
-
-        self.linear_layers = nn.Sequential(
+            nn.MaxPool2d(kernel_size = 2),
+            nn.Flatten(),
             nn.Linear(16 * 3 * 3, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p = 0.3),
             nn.Linear(512, int(nb_classes))
         )
 
+        self.model.apply(self.__init_weights)
+
+    def __init_weights(self, module: nn.Module):
+        if type(module) == nn.Linear:
+            nn.init.xavier_uniform_(module.weight)
+            module.bias.data.fill_(0.)
+        elif type(module) == nn.Conv2d:
+            nn.init.kaiming_uniform_(module.weight)
+            module.bias.data.fill_(0.01)
+
     def forward(self,x):
-        x = self.cnn_layers(x)
-        x = x.view(x.size(0), -1)
-        x = self.linear_layers(x)
-        return x
+        return self.model(x)
 
 
 class GoogleNet(nn.Module):

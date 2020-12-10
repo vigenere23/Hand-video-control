@@ -206,7 +206,7 @@ def run():
     # Parameters
     n_epochs = 50
     batch_size = 128
-    lr = 0.005
+    lr = 0.01
 
     # Loading dataset
     train_dataset = SignLanguageDataset("train")
