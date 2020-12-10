@@ -56,6 +56,7 @@ def test_realworld_images(model: nn.Module):
 
     for letter in LETTERS:
         image = cv2.imread(f"test_images/{letter}.jpg")
+        image = image[15:85, 15:85]
         predicted_letter = predict_sign(model, image)
         predictions.append(predicted_letter)
 

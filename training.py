@@ -47,9 +47,11 @@ class SignLanguageDataset():
         # self.__images = np.transpose(self.__images, (0, 1, 4, 2, 3))
 
         self.transform = nn.Sequential(
-            transforms.RandomResizedCrop((28, 28), scale=(0.9, 1.1), ratio=(9./10., 10./9.)),
-            transforms.RandomRotation(10),
-            transforms.RandomHorizontalFlip()
+            # TODO normalize?
+            transforms.RandomResizedCrop((28, 28), scale=(0.8, 1)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomAffine(10, scale=(0.8, 1), fillcolor=1)
             # transforms.Resize(224)
         )
 
@@ -57,7 +59,14 @@ class SignLanguageDataset():
         return self.__target.shape[0]
 
     def __getitem__(self, index):
-        return self.transform(self.__images[index]), self.__target[index]
+        image = self.__images[index]
+        image = transforms.ToPILImage()(image)
+        image = self.transform(image)
+        image = transforms.ToTensor()(image)
+
+        target = self.__target[index]
+
+        return image, target
 
 
 def calculate_accuracy(output, target):
@@ -164,7 +173,7 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
 
     for epoch_number in range(n_epochs):
         train_loss_sum = 0
-        print(f"\n------ EPOCH {epoch_number} ------\n")
+        print(f"\n------ EPOCH {epoch_number+1} ------\n")
 
         train_loss, train_accuracy = train_epoch(model, train_gen, val_gen, optimizer, criterion, scheduler=scheduler, verbose=verbose)
         test_loss, test_accuracy = test_epoch(model, test_gen, criterion)
@@ -195,13 +204,13 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
 
 def run():
     # Parameters
-    n_epochs = 20
+    n_epochs = 50
     batch_size = 128
-    lr = 0.001
+    lr = 0.005
 
     # Loading dataset
     train_dataset = SignLanguageDataset("train")
-    train_dataset, val_dataset = split_dataset(train_dataset, 0.9)
+    train_dataset, val_dataset = split_dataset(train_dataset, factor=0.8)
     test_dataset = SignLanguageDataset("test")
 
     # TODO create Dataloader to load in batches
@@ -214,7 +223,7 @@ def run():
     model_parameters = filter(lambda x: x.requires_grad, model.parameters())
     optimizer = optim.Adam(model_parameters, lr = lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=2, min_lr=0.00001, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=1, min_lr=0.00001, verbose=True)
 
     train(model, train_dataset, val_dataset, test_dataset, n_epochs, batch_size, optimizer, criterion, scheduler=scheduler, verbose=True)
 
