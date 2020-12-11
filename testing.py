@@ -28,7 +28,7 @@ def is_close_to_letter(predicted: str, truth: str) -> bool:
     return False
 
 
-def predict_sign(model: nn.Module, image: np.ndarray) -> str:
+def predict_sign(model: nn.Module, image: np.ndarray, threshold: float = 0.99) -> str:
     if torch.cuda.is_available():
         model = model.cuda()
 
@@ -38,10 +38,13 @@ def predict_sign(model: nn.Module, image: np.ndarray) -> str:
     if torch.cuda.is_available():
         image = image.cuda()
 
-    predicted_index = model(image).argmax(dim=1).item()
-    predicted_letter = chr(65 + predicted_index)
+    confidence, predicted_index = nn.functional.softmax(model(image)).max(dim=1)
+    print(confidence.item())
 
-    return predicted_letter
+    if confidence >= threshold:
+        return chr(65 + predicted_index.item())
+    else:
+        return None
 
 
 def find_sign_group(sign: str) -> str:
