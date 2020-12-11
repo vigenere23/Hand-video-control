@@ -46,10 +46,9 @@ class TrainSignLanguageDataset():
 
         self.transform = nn.Sequential(
             # TODO normalize?
-            transforms.RandomResizedCrop((28, 28), scale=(0.9, 1)),
             transforms.RandomHorizontalFlip(),
-            # transforms.RandomVerticalFlip(),
-            transforms.RandomAffine(10, scale=(0.9, 1), fillcolor=1)
+            transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.8, 1.2), fillcolor=255),
+            # transforms.GaussianBlur(3)
         )
 
     def __len__(self):
