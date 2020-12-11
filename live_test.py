@@ -8,7 +8,7 @@ from testing import predict_sign, find_sign_group
 
 
 def run():
-    model, *_ = load_model('0.954_Net_1607723644.4435968')
+    model, *_ = load_model('0.9147_Net_1607725284.0396557')
     cap = cv2.VideoCapture(0)
 
     while True:
@@ -25,7 +25,7 @@ def run():
         x, y, w, h = cv2.boundingRect(points)
 
         image = crop_square_region(capture, points)
-        sign = predict_sign(model, image)
+        sign = predict_sign(model, image, threshold=0.9)
         group = find_sign_group(sign)
         
         capture = cv2.rectangle(capture, (x,y), (x+w,y+h), (0,255,0), thickness=2)
