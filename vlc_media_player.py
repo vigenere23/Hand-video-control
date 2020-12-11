@@ -10,10 +10,10 @@ class VLCMediaPlayer:
     def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s"):
         self.url = url
         video = pafy.new(self.url).getbest()
-        self.media = vlc.MediaPlayer(video.url)
+        self.media_player = vlc.MediaPlayer(video.url)
 
     def play(self):
-        self.media.play()
+        self.media_player.play()
 
 
 if __name__ == "__main__":
