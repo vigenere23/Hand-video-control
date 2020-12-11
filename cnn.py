@@ -61,7 +61,7 @@ class GoogleNet(nn.Module):
 
 
 def load_model(filename: str):
-    data = torch.load(f"models/{filename}.plt")
+    data = torch.load(f"models/{filename}.plt", map_location='cpu')
 
     model: nn.Module = data['model']
     model.load_state_dict(data['model_state'])

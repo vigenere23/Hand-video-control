@@ -93,7 +93,7 @@ def test_realworld_images(model: nn.Module):
 
 
 def run():
-    model, *_ = load_model('1.0_Net_1607550837.585151')
+    model, *_ = load_model('0.9713_Net_1607701742.3824296')
     test_realworld_images(model)
 
 

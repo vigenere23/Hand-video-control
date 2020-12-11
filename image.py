@@ -34,7 +34,8 @@ def creating_images_array(data):
 
 
 def images_to_tensor(images):
-    images = np.array(images).reshape(int(images.shape[0]), 1, 28, 28)
+    images = np.array(images)
+    images = images.reshape(int(images.shape[0]), 1, 28, 28)
     images: torch.Tensor = torch.from_numpy(images)
     return images
 
@@ -61,19 +62,20 @@ def crop_square_region(image: np.ndarray, points: np.ndarray, padding_percentage
         raise ValueError("a square region could not be cropped due to original image size")
 
     padding = width * padding_percentage
-    size += padding
+    half_size = (size + padding) / 2 # test size
 
-    padding += min(cx - size/2, 0)
-    padding += min(width - cx - size/2, 0)
-    padding += min(cy - size/2, 0)
-    padding += min(height - cy - size/2, 0)
+    # ensure padding does not exceed image boundaries
+    padding += min(cx - half_size, 0)
+    padding += min(width - cx - half_size, 0)
+    padding += min(cy - half_size, 0)
+    padding += min(height - cy - half_size, 0)
 
-    size += padding
+    half_size = (size + padding) / 2 # final size
 
-    x1 = max(0, int(cx - size/2))
-    x2 = min(width, int(cx + size/2))
-    y1 = max(0, int(cy - size/2))
-    y2 = min(height, int(cy + size/2))
+    x1 = max(0, int(cx - half_size))
+    x2 = min(width, int(cx + half_size))
+    y1 = max(0, int(cy - half_size))
+    y2 = min(height, int(cy + half_size))
 
     image = image[y1:y2, x1:x2]
 

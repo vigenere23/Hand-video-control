@@ -3,8 +3,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import Dataset, DataLoader
 from cnn import Net, GoogleNet, save_model, load_model
-from image import images_to_tensor, creating_images_array
-from analyzing import test_realworld_images
+from testing import test_realworld_images
 from dataset import load_dataset, split_dataset, TrainSignLanguageDataset, TestSignLanguageDataset
 from barbar import Bar
 

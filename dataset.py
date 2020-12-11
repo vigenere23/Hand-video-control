@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
+from image import images_to_tensor, creating_images_array
 
 
 def load_csv_dataset(csv_path: str):
@@ -24,9 +25,8 @@ def load_dataset(dataset_type: str):
 
     try:
         images, target = torch.load(path)
-    except Exception as e:
-        print(e)
-        print("Loading from csv... this might take a while")
+    except IOError as e:
+        print("Loading dataset from csv... this might take a while")
         csv_path = os.path.join("data", f"sign_mnist_{dataset_type}.csv")
         images, target = load_csv_dataset(csv_path)
         torch.save([images, target], path)
