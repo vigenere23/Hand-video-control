@@ -68,7 +68,7 @@ def test_realworld_images(model: nn.Module):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, binary_image = cv2.threshold(image, 245, 255, cv2.THRESH_BINARY_INV)
         points = cv2.findNonZero(binary_image)
-        image = crop_square_region(image, points, padding_percentage=0.05)
+        image = crop_square_region(image, points, padding_percentage=0.2)
 
         predicted_letter = predict_sign(model, image)
         predictions.append(predicted_letter)
@@ -98,7 +98,7 @@ def test_realworld_images(model: nn.Module):
 
     predictions.sort()
     print(f"predictions:\t{', '.join(predictions)}")
-    print(f"unique pred.:\t{', '.join(set(predictions))}")
+    print(f"unique pred.:\t{len(set(predictions))}")
 
     return percentages
 
