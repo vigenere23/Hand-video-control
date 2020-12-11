@@ -47,7 +47,7 @@ class TrainSignLanguageDataset():
         self.transform = nn.Sequential(
             # TODO normalize?
             # transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.6, 1.2), fillcolor=255),
+            transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
             # transforms.GaussianBlur(3)
         )
 
