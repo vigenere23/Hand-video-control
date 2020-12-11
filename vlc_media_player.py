@@ -1,6 +1,6 @@
 import pafy
 import vlc
-
+import time
 
 class VLCMediaPlayer:
     """VLCMedia Player
@@ -23,16 +23,39 @@ class VLCMediaPlayer:
     def play(self):
         self._player.play()
 
+    def is_playing(self):
+        yield self._player.is_playing()
+
+    def pause(self):
+        self._player.pause()
+
+    def stop(self):
+        self._player.stop()
+
+    def mute(self):
+        print(self._player.audio_get_mute())
+        self._player.audio_toggle_mute()
+        print(self._player.audio_get_mute())
+
 
 
 if __name__ == "__main__":
     # media_player = VLCMediaPlayer(mode="terminal")
-    # try:
-    #     media_player.play()
-    #     input("Quit ?")
-    # except:
-    #     print("Excepted")
-    #     # media_player.stop()
     media_player = VLCMediaPlayer()
     media_player.play()
-    input("Quit ?")
+
+    ans = ""
+    while ans != "q":
+        ans = input("Action ?")
+        if ans == "p":
+            media_player.pause()
+        elif ans == "s":
+            media_player.stop()
+        elif ans == "go":
+            media_player.play()
+        elif ans == "m":
+            media_player.mute()
+
+
+    # while media_player.is_playing():
+    #     time.sleep(1)
