@@ -48,22 +48,33 @@ def normalize_image_input(image: np.ndarray):
     return torch.from_numpy(image)
 
 
-def get_square_boudaries(binary_image: np.ndarray, margins_percentage: float = 0.) -> tuple:
-    points = cv2.findNonZero(binary_image)
-
-    height = binary_image.shape[0]
-    width = binary_image.shape[1]
+def crop_square_region(image: np.ndarray, points: np.ndarray, padding_percentage: float = 0.) -> np.ndarray:
+    height = image.shape[0]
+    width = image.shape[1]
 
     x, y, w, h = cv2.boundingRect(points)
     cx, cy = x + w/2, y + h/2
 
-    if w < h:
-        w = h
-    w += width * margins_percentage
+    size = max(w, h) # so that a square fits all the boundaries
 
-    x1 = max(0, int(cx - w/2))
-    x2 = min(width, int(cx + w/2))
-    y1 = max(0, int(cy - w/2))
-    y2 = min(height, int(cy + w/2))
+    if size > width or size > height:
+        raise ValueError("a square region could not be cropped due to original image size")
 
-    return x1, x2, y1, y2
+    padding = width * padding_percentage
+    size += padding
+
+    padding += min(cx - size/2, 0)
+    padding += min(width - cx - size/2, 0)
+    padding += min(cy - size/2, 0)
+    padding += min(height - cy - size/2, 0)
+
+    size += padding
+
+    x1 = max(0, int(cx - size/2))
+    x2 = min(width, int(cx + size/2))
+    y1 = max(0, int(cy - size/2))
+    y2 = min(height, int(cy + size/2))
+
+    image = image[y1:y2, x1:x2]
+
+    return image

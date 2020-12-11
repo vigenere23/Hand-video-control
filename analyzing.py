@@ -2,7 +2,7 @@ import cv2
 import torch
 from torch import nn
 from cnn import load_model
-from image import normalize_image_input, get_square_boudaries
+from image import normalize_image_input, crop_square_region
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -45,7 +45,7 @@ def test_realworld_images(model: nn.Module):
     results = {
         'exact': set(),
         'close': set(),
-        'wrong': set()
+        'wrong': {}
     }
     percentages = []
     predictions = []
@@ -55,9 +55,9 @@ def test_realworld_images(model: nn.Module):
     for letter in LETTERS:
         image = cv2.imread(f"test_images/{letter}.jpg")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, binary_image = cv2.threshold(image, 250, 255, cv2.THRESH_BINARY_INV)
-        x1, x2, y1, y2 = get_square_boudaries(binary_image, margins_percentage=0.1)
-        image = image[y1:y2, x1:x2]
+        _, binary_image = cv2.threshold(image, 245, 255, cv2.THRESH_BINARY_INV)
+        points = cv2.findNonZero(binary_image)
+        image = crop_square_region(image, points, padding_percentage=0.05)
 
         predicted_letter = predict_sign(model, image)
         predictions.append(predicted_letter)
@@ -67,14 +67,21 @@ def test_realworld_images(model: nn.Module):
         elif is_close_to_letter(predicted_letter, letter):
             results['close'].add(letter)
         else:
-            results['wrong'].add(letter)
+            results['wrong'][letter] = predicted_letter
 
     print()
 
     for result_type, letters in results.items():
-        percentage = round(float(len(letters)) / float(len(LETTERS)) * 100, 1)
-        percentages.append(percentage)
-        print(f"{result_type} ({percentage}%):\t{', '.join(letters)}")
+        if result_type == 'wrong':
+            percentage = round(float(len(letters.keys())) / float(len(LETTERS)) * 100, 1)
+            percentages.append(percentage)
+            errors = ', '.join(map(lambda kv: kv[0]+'>'+kv[1], letters.items()))
+            keys = ', '.join(letters.keys())
+            print(f"{result_type} ({percentage}%):\t{errors if percentage <= 50 else keys}")
+        else:
+            percentage = round(float(len(letters)) / float(len(LETTERS)) * 100, 1)
+            percentages.append(percentage)
+            print(f"{result_type} ({percentage}%):\t{', '.join(letters)}")
 
     print()
 

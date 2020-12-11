@@ -1,84 +1,18 @@
-import pandas as pd
 import numpy as np
 import torch
 from torch import nn, optim
-from torch.utils.data import Dataset, DataLoader, random_split
-from torchvision import transforms
+from torch.utils.data import Dataset, DataLoader
 from cnn import Net, GoogleNet, save_model, load_model
 from image import images_to_tensor, creating_images_array
 from analyzing import test_realworld_images
-import cv2
-import os
+from dataset import load_dataset, split_dataset, TrainSignLanguageDataset, TestSignLanguageDataset
 from barbar import Bar
-
-
-def load_csv_dataset(csv_path: str):
-    dataset = pd.read_csv(csv_path)
-
-    images = images_to_tensor(creating_images_array(dataset))
-
-    target = dataset['label'].values.astype(int)
-    target = torch.from_numpy(target)
-
-    return images, target
-
-
-def load_dataset(dataset_type: str):
-    images = None
-    target = None
-    path = os.path.join("data", f"{dataset_type}.plt")
-
-    try:
-        images, target = torch.load(path)
-    except Exception as e:
-        print(e)
-        print("Loading from csv... this might take a while")
-        csv_path = os.path.join("data", f"sign_mnist_{dataset_type}.csv")
-        images, target = load_csv_dataset(csv_path)
-        torch.save([images, target], path)
-
-    return images, target
-
-
-class SignLanguageDataset():
-    def __init__(self, dataset_type: str):
-        self.__images, self.__target = load_dataset(dataset_type)
-        # self.__images = np.repeat(self.__images[..., np.newaxis], 3, -1)
-        # self.__images = np.transpose(self.__images, (0, 1, 4, 2, 3))
-
-        self.transform = nn.Sequential(
-            # TODO normalize?
-            transforms.RandomResizedCrop((28, 28), scale=(0.8, 1)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomAffine(10, scale=(0.8, 1), fillcolor=1)
-            # transforms.Resize(224)
-        )
-
-    def __len__(self):
-        return self.__target.shape[0]
-
-    def __getitem__(self, index):
-        image = self.__images[index]
-        image = transforms.ToPILImage()(image)
-        image = self.transform(image)
-        image = transforms.ToTensor()(image)
-
-        target = self.__target[index]
-
-        return image, target
 
 
 def calculate_accuracy(output, target):
     output_classes = output.argmax(dim=1)
     accuracy = ((output_classes == target).float().sum() / target.shape[0])
     return accuracy
-
-
-def split_dataset(dataset: Dataset, factor: float = 0.5):
-    first_dataset_length = int(len(dataset) * factor)
-    second_dataset_length = len(dataset) - first_dataset_length
-    return random_split(dataset, [first_dataset_length, second_dataset_length])
 
 
 def train_epoch(model: nn.Module, train_gen: DataLoader, val_gen: DataLoader, optimizer: optim.Optimizer, criterion: nn.Module, scheduler: object = None, verbose: bool = False):
@@ -161,7 +95,7 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
     test_losses = []
     train_accuracies = []
     test_accuracies = []
-    model_to_save = {}
+    best_model = {}
 
     train_gen = DataLoader(train_dataset, batch_size, shuffle=True)
     val_gen = DataLoader(val_dataset, batch_size, shuffle=False)
@@ -186,32 +120,41 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
         if verbose:
             test_realworld_images(model)
 
-        if (model_to_save.get('test_accuracy', 0) < test_accuracy):
-            model_to_save = {
+        if (best_model.get('test_accuracy', 0) < test_accuracy):
+            best_model = {
                 'model': model,
                 'optimizer': optimizer,
                 'criterion': criterion,
                 'test_accuracy': test_accuracy
             }
 
+    last_model = {
+        'model': model,
+        'optimizer': optimizer,
+        'criterion': criterion,
+        'test_accuracy': test_accuracy
+    }
+
     print("\n------ SUMMARY ------\n")
     print(f"Max train accuracy: {np.array(train_accuracies).max()}")
     print(f"Max test accuracy: {np.array(test_accuracies).max()}")
 
-    save_path = save_model(**model_to_save)
-    print(f"\nSaved best iteration to {save_path}")
+    best_model_save_path = save_model(**best_model)
+    last_model_save_path = save_model(**last_model)
+    print(f"\nSaved best iteration to {best_model_save_path}")
+    print(f"\nSaved last iteration to {last_model_save_path}")
 
 
 def run():
     # Parameters
-    n_epochs = 50
+    n_epochs = 40
     batch_size = 128
     lr = 0.01
 
     # Loading dataset
-    train_dataset = SignLanguageDataset("train")
+    train_dataset = TrainSignLanguageDataset()
     train_dataset, val_dataset = split_dataset(train_dataset, factor=0.8)
-    test_dataset = SignLanguageDataset("test")
+    test_dataset = TestSignLanguageDataset()
 
     # TODO create Dataloader to load in batches
 
@@ -223,7 +166,7 @@ def run():
     model_parameters = filter(lambda x: x.requires_grad, model.parameters())
     optimizer = optim.Adam(model_parameters, lr = lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=1, min_lr=0.00001, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=2, min_lr=0.00001, verbose=True)
 
     train(model, train_dataset, val_dataset, test_dataset, n_epochs, batch_size, optimizer, criterion, scheduler=scheduler, verbose=True)
 
