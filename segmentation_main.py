@@ -40,6 +40,68 @@ def stackImages(scale,imgArray):
         ver = hor
     return ver
  
+def getContours(img, imgContour):
+    contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) # Trouve extreme outter* contour
+    if not contours:
+        return
+    area = []
+    for cnts in contours:
+        area.append(cv2.contourArea(cnts))
+    
+    max_area = np.max(area)
+    max_arg = np.argmax(area)
+    cnt = contours[max_arg]
+
+    #for cnt in contours:
+    #    area = cv2.contourArea(cnt)
+    #    if area > 200:
+    cv2.drawContours(imgContour, cnt, -1, (255,0,0), 3) #-1: draw all contours
+    peri = cv2.arcLength(cnt, True)
+    print(peri)
+    approx = cv2.approxPolyDP(cnt, 0.02*peri, True) # Approxime nombre de coins
+    print(len(approx))
+    objCorner = len(approx)
+    x, y, w, h = cv2.boundingRect(approx)
+    cv2.rectangle(imgContour, (x,y), (x+w, y+h), (0,255,0), 2)
+    cv2.putText(imgContour,"Area: {}".format(max_area),(x+(w//2)-10, y+(h//2)-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0),2)
+    return x,y,w,h
+
+# Méthode qui fontionne le mieux!
+
+def segmentation_contour():
+    while True:
+        sucess, img = webcam.read()
+        imgContour = img.copy()
+        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h_min = 0
+        h_max = 19
+        s_min = 21
+        s_max = 255
+        v_min = 29
+        v_max = 255
+        lower = np.array([h_min, s_min, v_min])
+        upper = np.array([h_max, s_max, v_max])
+        mask = cv2.inRange(imgHSV, lower, upper)
+        imgResult = cv2.bitwise_and(img, img, mask=mask) # add 2 images ensemble et crée une seule
+        imgResult = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
+        imgBlur = cv2.blur(imgResult, (3,3))
+        imgCanny = cv2.Canny(imgBlur, 150,50)
+        getContours(imgCanny, imgContour)
+        imgStack = stackImages(0.7, ([imgCanny], [imgContour]))
+        cv2.imshow("Images Stack", imgStack)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+
+segmentation_contour()
+
+
+
+##############################################################################################################################
+##############################################################################################################################
+#                                                     TESTS                                                                  #
+##############################################################################################################################
+##############################################################################################################################
+
 ## HSV values detection
 #cv2.namedWindow("TrackBars")
 #cv2.resizeWindow("TrackBars", (640,240))
@@ -166,32 +228,6 @@ def getContours(img, imgContour):
     cv2.putText(imgContour,"Area: {}".format(max_area),(x+(w//2)-10, y+(h//2)-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0),2)
     return x,y,w,h
 
-
-
-def segmentation_contour():
-    while True:
-        sucess, img = webcam.read()
-        imgContour = img.copy()
-        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        h_min = 0
-        h_max = 19
-        s_min = 21
-        s_max = 255
-        v_min = 29
-        v_max = 255
-        lower = np.array([h_min, s_min, v_min])
-        upper = np.array([h_max, s_max, v_max])
-        mask = cv2.inRange(imgHSV, lower, upper)
-        imgResult = cv2.bitwise_and(img, img, mask=mask) # add 2 images ensemble et crée une seule
-        imgResult = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
-        imgBlur = cv2.blur(imgResult, (3,3))
-        imgCanny = cv2.Canny(imgBlur, 150,50)
-        getContours(imgCanny, imgContour)
-        imgStack = stackImages(0.7, ([imgCanny], [imgContour]))
-        cv2.imshow("Images Stack", imgStack)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-
 def segmentation_contour_2():
     count = True
     Weight = 0.5
@@ -246,9 +282,8 @@ def segmentation_contour_3():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
-#segmentation_contour()
 #segmentation_contour_2()
-segmentation_contour_3()
+#segmentation_contour_3()
 #Une ligne de trop pour modifier
 #cv2.imshow("image", image_result)
 #cv2.waitKey(0)
