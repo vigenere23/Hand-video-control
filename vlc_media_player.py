@@ -42,6 +42,12 @@ class VLCMediaPlayer:
     def mute(self):
         self._player.audio_toggle_mute()
 
+    def next_frame(self):
+        self._player.next_frame()
+
+    def get_state(self):
+        return self._player.get_state()
+
 
 
 if __name__ == "__main__":
