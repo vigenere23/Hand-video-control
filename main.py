@@ -13,9 +13,9 @@ def main():
     #vmp.setup()
     # Use Webcam
     webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
-    webcam.set(3,640) # id pour le nombre de pixel I guess 
-    webcam.set(4,480) # id pour le nombre de pixel I guess
-    webcam.set(10,75) # id pour le brightness
+    webcam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # id pour le nombre de pixel I guess
+    webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # id pour le nombre de pixel I guess
+    webcam.set(cv2.CAP_PROP_BRIGHTNESS, 75)  # id pour le brightness
     # Load CNN model
     model, *_ = load_model('0.954_Net_1607723644.4435968')
 
@@ -26,7 +26,7 @@ def main():
 
         # Return image of just the hand
         image_hand = segmentation_contour(image)
-    
+
         # Modify images for the CNN model
         image_resize = modify_image_format(image_hand)
         cv2.imshow("Image main", image_resize)
