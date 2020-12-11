@@ -8,12 +8,15 @@ import numpy as np
 
 
 LETTER_GROUPS = {
-    'round': ['A', 'E', 'M', 'N', 'O', 'S', 'T'],
-    'pointing': ['D', 'I', 'K', 'R', 'U', 'X'],
-    'double_pointing': ['L', 'V'],
-    'triple_pointing': ['F', 'W'],
+    'fist': ['A', 'E', 'M', 'N', 'O', 'S', 'X'],
+    'pointing_up': ['X', 'U', 'R', 'K', 'D', 'I', 'T'],
+    'opened': ['B', 'C'],
+    'pointing_side': ['G', 'H'],
+    'Y': ['Y'],
+    'F': ['F'],
+    'L': ['L'],
     'pointing_down': ['P', 'Q'],
-    'opened': ['B', 'C', 'E']
+    'peace': ['V', 'W']
 }
 
 
@@ -39,6 +42,14 @@ def predict_sign(model: nn.Module, image: np.ndarray) -> str:
     predicted_letter = chr(65 + predicted_index)
 
     return predicted_letter
+
+
+def find_sign_group(sign: str) -> str:
+    for group, letters in LETTER_GROUPS.items():
+        if sign in letters:
+            return group
+    
+    return None
 
 
 def test_realworld_images(model: nn.Module):
@@ -93,7 +104,7 @@ def test_realworld_images(model: nn.Module):
 
 
 def run():
-    model, *_ = load_model('0.9713_Net_1607701742.3824296')
+    model, *_ = load_model('0.8807_Net_1607714720.6292076')
     test_realworld_images(model)
 
 
