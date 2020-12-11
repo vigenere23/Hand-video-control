@@ -23,4 +23,16 @@
     * L (Loser)
     * Main ouverte
 
+### Mapping
+
+```python
+actions = dict(
+    l="rewind",
+    peace="pause",
+    y="play",
+    F="mute",
+    B="stop",
+    pointing_up="FF",
+)
+```
 
