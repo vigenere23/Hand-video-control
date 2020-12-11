@@ -66,44 +66,41 @@ def getContours(img, imgContour):
     cv2.putText(imgContour,"Area: {}".format(max_area),(x+(w//2)-10, y+(h//2)-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0),2)
     return x,y,w,h
 
+# Méthode qui fontionne le mieux!
+
+def segmentation_contour(img):
+    # Ajout d'un temps de repos
+    imgContour = img.copy()
+    imgFinal = img.copy()
+    imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h_min = 0
+    h_max = 19
+    s_min = 21
+    s_max = 255
+    v_min = 29
+    v_max = 255
+    lower = np.array([h_min, s_min, v_min])
+    upper = np.array([h_max, s_max, v_max])
+    mask = cv2.inRange(imgHSV, lower, upper)
+    imgBlur = cv2.blur(mask,(5,5))
+    imgBlur = cv2.morphologyEx(imgBlur, cv2.MORPH_CLOSE, (7,7))
+    x, y, w, h = 0,0,0,0
+    x, y, w, h = getContours(imgBlur, imgContour)
+    cv2.imshow("Image finale", imgFinal[y:y+h, x:x+w])
+    imgStack = stackImages(0.7, ([imgBlur], [imgContour]))
+    cv2.imshow("Images stack", imgStack)
+
 # Use Webcam
 webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
 webcam.set(3,640) # id pour le nombre de pixel I guess 
 webcam.set(4,480) # id pour le nombre de pixel I guess
 webcam.set(10,75) # id pour le brightness
+while True:
+    sucess, img = webcam.read()
+    segmentation_contour(img)
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
 
-# Méthode qui fontionne le mieux!
-
-def segmentation_contour():
-    while True:
-        sucess, img = webcam.read()
-        imgContour = img.copy()
-        imgFinal = img.copy()
-        imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        h_min = 0
-        h_max = 19
-        s_min = 21
-        s_max = 255
-        v_min = 29
-        v_max = 255
-        lower = np.array([h_min, s_min, v_min])
-        upper = np.array([h_max, s_max, v_max])
-        mask = cv2.inRange(imgHSV, lower, upper)
-        imgResult = cv2.bitwise_and(img, img, mask=mask) # add 2 images ensemble et crée une seule
-        imgResult = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
-        x, y, w, h = 0,0,0,0
-        imgBlur = cv2.blur(imgResult, (3,3))
-        imgCanny = cv2.Canny(imgBlur, 150,50)
-        x, y, w, h = getContours(imgCanny, imgContour)
-        #cv2.imshow("Images contours", imgContour)
-        print(x,y,w,h)
-        cv2.imshow("Image finale", imgFinal[y:y+h, x:x+w])
-        imgStack = stackImages(0.7, ([imgCanny], [imgContour]))
-        cv2.imshow("Images stack", imgStack)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-
-segmentation_contour()
 
 
 
