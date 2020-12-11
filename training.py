@@ -140,15 +140,15 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
     print(f"Max test accuracy: {np.array(test_accuracies).max()}")
 
     best_model_save_path = save_model(**best_model)
-    last_model_save_path = save_model(**last_model)
+    # last_model_save_path = save_model(**last_model)
     print(f"\nSaved best iteration to {best_model_save_path}")
-    print(f"\nSaved last iteration to {last_model_save_path}")
+    # print(f"\nSaved last iteration to {last_model_save_path}")
 
 
 def run():
     # Parameters
-    n_epochs = 25
-    batch_size = 256
+    n_epochs = 30
+    batch_size = 512
     lr = 0.01
 
     # Loading dataset

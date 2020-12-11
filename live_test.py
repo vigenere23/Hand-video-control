@@ -8,7 +8,7 @@ from testing import predict_sign, find_sign_group
 
 
 def run():
-    model, *_ = load_model('0.8807_Net_1607714720.6292076')
+    model, *_ = load_model('0.954_Net_1607723644.4435968')
     cap = cv2.VideoCapture(0)
 
     while True:
