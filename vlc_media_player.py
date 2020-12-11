@@ -26,12 +26,20 @@ class VLCMediaPlayer:
             media.get_mrl()
             self._player.set_media(media)
 
+    def get_state(self):
+        return self._player.get_state()
+
+    def is_paused(self):
+        return self.get_state() == vlc.State.Paused
+
+    def is_stopped(self):
+        return self.get_state() == vlc.State.Stopped
+
+    def is_playing(self):
+        return self._player.is_playing()
 
     def play(self):
         self._player.play()
-
-    def is_playing(self):
-        yield self._player.is_playing()
 
     def pause(self):
         self._player.pause()
@@ -44,9 +52,6 @@ class VLCMediaPlayer:
 
     def next_frame(self):
         self._player.next_frame()
-
-    def get_state(self):
-        return self._player.get_state()
 
 
 
