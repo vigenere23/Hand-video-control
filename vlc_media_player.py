@@ -7,6 +7,13 @@ class VLCMediaPlayer:
     Play a video with VLC, from a YouTube url
     """
 
+    # Play
+    # Stop
+    # Pause
+    # Mute
+    # FF
+    # Rewind
+
     def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s", mode=None):
         self.url = url
         video = pafy.new(self.url).getbest()
@@ -33,9 +40,7 @@ class VLCMediaPlayer:
         self._player.stop()
 
     def mute(self):
-        print(self._player.audio_get_mute())
         self._player.audio_toggle_mute()
-        print(self._player.audio_get_mute())
 
 
 
