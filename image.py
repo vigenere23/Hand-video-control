@@ -61,7 +61,7 @@ def crop_square_region(image: np.ndarray, points: np.ndarray, padding_percentage
     if size > width or size > height:
         raise ValueError("a square region could not be cropped due to original image size")
 
-    padding = width * padding_percentage
+    padding = size * padding_percentage
     half_size = (size + padding) / 2 # test size
 
     # ensure padding does not exceed image boundaries

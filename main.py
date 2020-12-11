@@ -1,13 +1,44 @@
-import vlc_media_player as vmp
+import cv2
+import torch
+import time
+import numpy as np
+from cnn import load_model
+from image import normalize_image_input, crop_square_region
+from testing import predict_sign, find_sign_group
+from segmentation_main import segmentation_contour, getContours, modify_image_format
+#import vlc_media_player as vmp
 
 
 def main():
-    vmp.setup()
+    #vmp.setup()
+    # Use Webcam
+    webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
+    webcam.set(3,640) # id pour le nombre de pixel I guess 
+    webcam.set(4,480) # id pour le nombre de pixel I guess
+    webcam.set(10,75) # id pour le brightness
+    # Load CNN model
+    model, *_ = load_model('0.954_Net_1607723644.4435968')
 
-    img = capture_image()
-    segmented_img = segmentation(img)
-    pred = classify(segmented_img)
-    vmp.run(pred)
+    while True:
+        # Capture image from webcam
+        sucess, image = webcam.read()
+        capture = image.copy()
+
+        # Return image of just the hand
+        image_hand = segmentation_contour(image)
+    
+        # Modify images for the CNN model
+        image_resize = modify_image_format(image_hand)
+        cv2.imshow("Image main", image_resize)
+        sign = predict_sign(model, image_resize)
+        group = find_sign_group(sign)
+
+
+        capture = cv2.putText(capture, f"{sign} {str(group)}", (10, capture.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), thickness=3)
+        cv2.imshow("Image", capture)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+        #vmp.run(pred)
 
 
 if __name__ == "__main__":
