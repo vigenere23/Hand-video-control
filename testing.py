@@ -9,7 +9,7 @@ import numpy as np
 
 LETTER_GROUPS = {
     'fist': ['A', 'E', 'M', 'N', 'O', 'S', 'X'],
-    'pointing_up': ['X', 'U', 'R', 'K', 'D', 'I', 'T'],
+    'pointing_up': ['U', 'R', 'K', 'D', 'I', 'T'],
     'opened': ['B', 'C'],
     'pointing_side': ['G', 'H'],
     'Y': ['Y'],
