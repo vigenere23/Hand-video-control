@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import time
 
 import cv2
@@ -38,7 +40,7 @@ def main():
             print(e)
 
         group = find_sign_group(sign)
-        
+
         capture = cv2.putText(
             capture,
             f"{sign} {str(group)}",
