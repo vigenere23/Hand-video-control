@@ -1,7 +1,15 @@
 import pafy
 import vlc
 import time
+from enum import IntEnum, auto
 
+class Action(IntEnum):
+    PLAY = 1
+    PAUSE = 2
+    STOP = 3
+    MUTE = 4
+    VOL_UP = 5
+    VOL_DN = 6
 
 class VLCMediaPlayer:
     """VLC Media Player
@@ -27,6 +35,7 @@ class VLCMediaPlayer:
             media.get_mrl()
             self._player.set_media(media)
 
+    # STATES
     def get_state(self):
         return self._player.get_state()
 
@@ -39,6 +48,7 @@ class VLCMediaPlayer:
     def is_playing(self):
         return self._player.is_playing()
 
+    # ACTIONS (PLAYBACK)
     def play(self):
         self._player.play()
 
@@ -54,6 +64,24 @@ class VLCMediaPlayer:
     def next_frame(self):
         self._player.next_frame()
 
+    # ACTIONS (VOLUME)
+    def get_volume(self):
+        return self._player.audio_get_volume()
+
+    def set_volume(self, val):
+        if val < 0:
+            print("Volume minimal atteint")
+        elif val > 100:
+            print("Volume maximal atteint")
+        else:
+            self._player.audio_set_volume(val)
+
+    def volume_up(self, offset):
+        self.set_volume(self.get_volume() + offset)
+
+    def volume_dn(self, offset):
+        self.set_volume(self.get_volume() - offset)
+
 
 class VLCController:
     """VLC Controller
@@ -63,6 +91,14 @@ class VLCController:
     def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s"):
         self.media_player = VLCMediaPlayer(url)
         self.last_seen = None
+        self.actions_dict = dict(
+            y=Action.PLAY,
+            peace=Action.PAUSE,
+            B=Action.STOP,
+            F=Action.MUTE,
+            l=Action.VOL_UP,
+            up=Action.VOL_DN
+        )
 
     def test_run(self):
         self.media_player.play()
@@ -73,22 +109,34 @@ class VLCController:
     def run(self, prediction):
         "Decide from prediction"
 
-        if self.last_seen is None:
-            decision = prediction
-        else:
-            decision = prediction
-            self.last_seen = decision
+        # Not taking None in acount
+        if prediction is None:
+            return
+
+        # Create decision and keep last_seen in decision variable
+        decision = prediction
+
+        self.last_seen = prediction
+
+        # Act accordingly
+        self.action(decision)
+
+    def is_playing(self):
+        return self.media_player.is_playing()
 
     def action(self, decision):
         """Control VLC Media Player accordingly to decision"""
-        actions = dict(
-            l="rewind",
-            peace="pause",
-            y="play",
-            F="mute",
-            B="stop",
-            up="fastforward"
-        )
+        dec_act = self.actions_dict[decision]
+
+        action_options = {
+            Action.PLAY:self.media_player.play,
+            Action.PAUSE:self.media_player.pause,
+            Action.STOP:self.media_player.stop,
+            Action.MUTE:self.media_player.mute,
+            Action.VOL_UP:self.media_player.volume_up,
+            Action.VOL_DN:self.media_player.volume_dn,
+        }
+        action_options[dec_act]()
 
 
 if __name__ == "__main__":
