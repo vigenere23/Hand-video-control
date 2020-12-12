@@ -14,12 +14,12 @@ def main():
     vlc_control = VLCController()
 
     # Use Webcam
-    webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
+    webcam = cv2.VideoCapture(0)  # Seule caméra est celle de l'ordi
     webcam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # id pour le nombre de pixel I guess
     webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # id pour le nombre de pixel I guess
     webcam.set(cv2.CAP_PROP_BRIGHTNESS, 75)  # id pour le brightness
     # Load CNN model
-    model, *_ = load_model('0.954_Net_1607723644.4435968')
+    model, *_ = load_model("0.954_Net_1607723644.4435968")
 
     while True:
         # Capture image from webcam
@@ -35,11 +35,20 @@ def main():
         sign = predict_sign(model, image_resize)
         group = find_sign_group(sign)
 
-        capture = cv2.putText(capture, f"{sign} {str(group)}", (10, capture.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), thickness=3)
+        capture = cv2.putText(
+            capture,
+            f"{sign} {str(group)}",
+            (10, capture.shape[0] - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            2,
+            (0, 0, 255),
+            thickness=3,
+        )
         cv2.imshow("Image", capture)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-        vlc_control.run(pred)
+        print(group)
+        # vlc_control.run(pred)
 
 
 if __name__ == "__main__":
