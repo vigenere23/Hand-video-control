@@ -62,28 +62,55 @@ class VLCController:
 
     def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s"):
         self.media_player = VLCMediaPlayer(url)
+        self.last_seen = None
+
+    def test_run(self):
+        self.media_player.play()
+        time.sleep(5)
+        self.media_player.pause()
+        time.sleep(3)
 
     def run(self, prediction):
-        "Control VLC Media Player accordingly to prediction"
-        pass
+        "Decide from prediction"
+
+        if self.last_seen is None:
+            decision = prediction
+        else:
+            decision = prediction
+            self.last_seen = decision
+
+    def action(self, decision):
+        """Control VLC Media Player accordingly to decision"""
+        actions = dict(
+            l="rewind",
+            peace="pause",
+            y="play",
+            F="mute",
+            B="stop",
+            up="fastforward"
+        )
 
 
 if __name__ == "__main__":
     # media_player = VLCMediaPlayer(mode="terminal")
-    media_player = VLCMediaPlayer()
-    media_player.play()
+    # media_player = VLCMediaPlayer()
+    # media_player.play()
 
-    ans = ""
-    while ans != "q":
-        ans = input("Action ?")
-        if ans == "p":
-            media_player.pause()
-        elif ans == "s":
-            media_player.stop()
-        elif ans == "go":
-            media_player.play()
-        elif ans == "m":
-            media_player.mute()
+    # ans = ""
+    # while ans != "q":
+    #     ans = input("Action ?")
+    #     if ans == "p":
+    #         media_player.pause()
+    #     elif ans == "s":
+    #         media_player.stop()
+    #     elif ans == "go":
+    #         media_player.play()
+    #     elif ans == "m":
+    #         media_player.mute()
 
     # while media_player.is_playing():
     #     time.sleep(1)
+
+    control = VLCController()
+    while True:
+        control.test_run()
