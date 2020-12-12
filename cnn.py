@@ -26,29 +26,30 @@ class HandyNetLayer(nn.Module):
     def forward(self,x):
         return self.model(x)
 
-    @classmethod
-    def create(constructor, previous_layer, channel_out: int, kernel_size: int = 3, padding: int = 0, max_pooling: bool = False):
-        return constructor(previous_layer.size, previous_layer.channel_out, channel_out, kernel_size=kernel_size, padding=padding, max_pooling=max_pooling)
+    def add_next(self, channel_out: int, kernel_size: int = 3, padding: int = 0, max_pooling: bool = False):
+        return HandyNetLayer(self.size, self.channel_out, channel_out, kernel_size=kernel_size, padding=padding, max_pooling=max_pooling)
 
 
 class HandyNet(nn.Module):
     def __init__(self, nb_classes):
         super().__init__()
 
-        layer1 = HandyNetLayer(28, 1, 32)
-        layer2 = HandyNetLayer.create(layer1, 64, max_pooling=True)
-        layer3 = HandyNetLayer.create(layer2, 128, padding=1, max_pooling=True)
-        layer4 = HandyNetLayer.create(layer3, 128, padding=1, max_pooling=True)
+        conv1 = HandyNetLayer(28, 1, 32)
+        conv2 = conv1.add_next(64, max_pooling=True)
+        conv3 = conv2.add_next(128, padding=1, max_pooling=True)
+        conv4 = conv3.add_next(128, padding=1, max_pooling=True)
+        full1 = nn.Linear(conv4.size ** 2 * conv4.channel_out, 256)
+        full2 = nn.Linear(256, int(nb_classes))
 
         self.model = nn.Sequential(
-            layer1,
-            layer2,
-            layer3,
-            layer4,
+            conv1,
+            conv2,
+            conv3,
+            conv4,
             nn.Flatten(),
-            nn.Linear(layer4.size ** 2 * layer4.channel_out, 256),
+            full1,
             nn.ReLU(inplace=True),
-            nn.Linear(256, int(nb_classes))
+            full2
         )
 
         self.model.apply(self.__init_weights)
