@@ -99,6 +99,7 @@ class VLCController:
             L=Action.VOL_UP,
             pointing_up=Action.VOL_DN
         )
+        self.media_player.play()
 
     def test_run(self):
         self.media_player.play()

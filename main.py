@@ -65,9 +65,5 @@ def main():
             vlc_control.run(group)
         delay.process = False
 
-        # Delay capture
-        time.sleep(DELAY)
-
-
 if __name__ == "__main__":
     main()
