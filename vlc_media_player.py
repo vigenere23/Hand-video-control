@@ -5,7 +5,9 @@ from enum import IntEnum, auto
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    level=logging.DEBUG, format="[%(levelname)s]: %(asctime)s:%(module)s:%(message)s"
+)
 
 
 class Action(IntEnum):
@@ -68,7 +70,7 @@ class VLCMediaPlayer:
         self._player.stop()
 
     def mute(self):
-        logging.debug(f"Muted : {self._player.audo_get_mute()}")
+        logging.debug(f"Muted : {self._player.audio_get_mute()}")
         self._player.audio_toggle_mute()
 
     def next_frame(self):
