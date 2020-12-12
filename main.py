@@ -6,11 +6,13 @@ from cnn import load_model
 from image import normalize_image_input, crop_square_region
 from testing import predict_sign, find_sign_group
 from segmentation_main import segmentation_contour, getContours, modify_image_format
-#import vlc_media_player as vmp
+from vlc_media_player import VLCController
 
 
 def main():
-    #vmp.setup()
+    # Contrôle de VLC
+    vlc_control = VLCController()
+
     # Use Webcam
     webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
     webcam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # id pour le nombre de pixel I guess
@@ -33,12 +35,11 @@ def main():
         sign = predict_sign(model, image_resize)
         group = find_sign_group(sign)
 
-
         capture = cv2.putText(capture, f"{sign} {str(group)}", (10, capture.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), thickness=3)
         cv2.imshow("Image", capture)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-        #vmp.run(pred)
+        vlc_control.run(pred)
 
 
 if __name__ == "__main__":
