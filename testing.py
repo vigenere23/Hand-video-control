@@ -28,7 +28,7 @@ def is_close_to_letter(predicted: str, truth: str) -> bool:
     return False
 
 
-def predict_sign(model: nn.Module, image: np.ndarray, threshold: float = 0.99) -> str:
+def predict_sign(model: nn.Module, image: np.ndarray, threshold: float = 0.99, verbose: bool = False) -> str:
     if torch.cuda.is_available():
         model = model.cuda()
 
@@ -39,7 +39,9 @@ def predict_sign(model: nn.Module, image: np.ndarray, threshold: float = 0.99) -
         image = image.cuda()
 
     confidence, predicted_index = nn.functional.softmax(model(image)).max(dim=1)
-    print(confidence.item())
+    
+    if verbose:
+        print(confidence.item())
 
     if confidence >= threshold:
         return chr(65 + predicted_index.item())
@@ -73,7 +75,7 @@ def test_realworld_images(model: nn.Module):
         points = cv2.findNonZero(binary_image)
         image = crop_square_region(image, points, padding_percentage=0.2)
 
-        predicted_letter = predict_sign(model, image)
+        predicted_letter = predict_sign(model, image, threshold=0)
         predictions.append(predicted_letter)
 
         if predicted_letter == letter:

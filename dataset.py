@@ -5,6 +5,7 @@ from torch import nn
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
 from image import images_to_tensor, creating_images_array
+import cv2
 
 
 def load_csv_dataset(csv_path: str):
@@ -46,9 +47,9 @@ class TrainSignLanguageDataset():
 
         self.transform = nn.Sequential(
             # TODO normalize?
-            # transforms.RandomHorizontalFlip(),
+            transforms.RandomHorizontalFlip(),
             transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
-            # transforms.GaussianBlur(3)
+            transforms.GaussianBlur(3, sigma=(0.1, 0.5))
         )
 
     def __len__(self):
@@ -57,7 +58,6 @@ class TrainSignLanguageDataset():
     def __getitem__(self, index):
         image = self.__images[index]
         image = transforms.ToPILImage()(image)
-        image = self.transform(image)
         image = transforms.ToTensor()(image)
 
         target = self.__target[index]
