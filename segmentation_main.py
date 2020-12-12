@@ -17,7 +17,7 @@ def getContours(img, imgContour):
     approx = cv2.approxPolyDP(cnt, 0.02*peri, True) # Approxime nombre de coins
     x, y, w, h = cv2.boundingRect(approx)
     cv2.rectangle(imgContour, (x,y), (x+w, y+h), (0,255,0), 2)
-    cv2.putText(imgContour,"Area: {}".format(max_area),(x+(w//2)-10, y+(h//2)-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0),2)
+    #cv2.putText(imgContour,"Area: {}".format(max_area),(x+(w//2)-10, y+(h//2)-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,0,0),2)
     return x,y,w,h
 
 # Méthode qui fontionne le mieux!
@@ -117,19 +117,25 @@ def segmentation_contour_test(img):
     imgBlur = cv2.morphologyEx(imgBlur, cv2.MORPH_CLOSE, (7,7))
     x, y, w, h = 0,0,0,0
     x, y, w, h = getContours(imgBlur, imgContour)
-    cv2.imshow("Image finale", imgFinal[y:y+h, x:x+w])
-    imgStack = stackImages(0.7, ([imgBlur], [imgContour]))
-    cv2.imshow("Images stack", imgStack)
+    #cv2.imshow("Image finale", imgFinal[y:y+h, x:x+w])
+    #imgStack = stackImages(0.7, ([imgBlur], [imgContour]))
+    #cv2.imshow("Images stack", imgStack)
+    cv2.imshow("Masque", mask)
+    return mask, img, imgContour, imgFinal[y:y+h, x:x+w]
 
-# Use Webcam
+## Use Webcam
 #webcam = cv2.VideoCapture(0) # Seule caméra est celle de l'ordi
 #webcam.set(3,640) # id pour le nombre de pixel I guess 
 #webcam.set(4,480) # id pour le nombre de pixel I guess
 #webcam.set(10,75) # id pour le brightness
 #while True:
 #    sucess, img = webcam.read()
-#    segmentation_contour(img)
+#    mask, img, imgContour, imgFinal = segmentation_contour_test(img)
 #    if cv2.waitKey(1) & 0xFF == ord("q"):
+#        cv2.imwrite("image_mask.png", mask)
+#        cv2.imwrite("image_normale.png", img)
+#        cv2.imwrite("image_contour.png", imgContour)
+#        cv2.imwrite("image_finale.png", imgFinal)
 #        break
 
 ## HSV values detection

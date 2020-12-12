@@ -36,8 +36,10 @@ class VLCMediaPlayer:
         video = pafy.new(self.url).getbest()
         if str(mode).lower() == "terminal":
             self._player = vlc.MediaPlayer(video.url)
+            instance = vlc.Instance("prefer-insecure")
         else:
             instance = vlc.Instance("--loop")
+            #instance = vlc.Instance("prefer-insecure")
             self._player = instance.media_player_new()
             media = instance.media_new(video.url)
             media.get_mrl()

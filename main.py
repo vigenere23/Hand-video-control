@@ -33,6 +33,7 @@ def main():
         try:
             image_hand = segmentation_contour(image)
             cv2.imshow("Image main", image_hand)
+            print("Taille image: {}".format(image_hand.shape))
             sign = predict_sign(model, image_hand, threshold=0.9)
         except Exception as e:
             print(e)
