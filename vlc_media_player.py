@@ -3,6 +3,10 @@ import vlc
 import time
 from enum import IntEnum, auto
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 class Action(IntEnum):
     PLAY = 1
@@ -52,15 +56,19 @@ class VLCMediaPlayer:
 
     # ACTIONS (PLAYBACK)
     def play(self):
+        logging.debug("Playing")
         self._player.play()
 
     def pause(self):
+        logging.debug("Paused")
         self._player.pause()
 
     def stop(self):
+        logging.debug("Stopped")
         self._player.stop()
 
     def mute(self):
+        logging.debug(f"Muted : {self._player.audo_get_mute()}")
         self._player.audio_toggle_mute()
 
     def next_frame(self):
@@ -79,9 +87,11 @@ class VLCMediaPlayer:
             self._player.audio_set_volume(val)
 
     def volume_up(self, offset=5):
+        logging.debug("Increased volume")
         self.set_volume(self.get_volume() + offset)
 
     def volume_dn(self, offset=5):
+        logging.debug("Decreased volume")
         self.set_volume(self.get_volume() - offset)
 
 
@@ -127,15 +137,14 @@ class VLCController:
     def run(self, prediction):
         "Decide from prediction"
 
-        self._delay_results.append(prediction)
-
         # Not taking None in acount
         if prediction is None or prediction not in self.actions_dict.keys():
             return
+        else:
+            self._delay_results.append(prediction)
+            results = self._delay_results
 
         if self._delay():
-            results = [r for r in self._delay_results if r is not None]
-
             # Create decision and keep last_seen in decision variable
             decision = max(set(results), key=results.count)
             self.last_seen = decision
