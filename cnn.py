@@ -1,30 +1,55 @@
 import time
 import torch
 from torch import nn, optim
-from torchvision.models import googlenet
 
 
-class Net(nn.Module):
+class HandyNetLayer(nn.Module):
+    def __init__(self, size: int, channel_in: int, channel_out: int, kernel_size: int = 3, padding: int = 0, max_pooling: bool = False):
+        super().__init__()
+
+        self.channel_in = channel_in
+        self.channel_out = channel_out
+        self.size = size - (kernel_size - 1) + 2*padding
+
+        modules = [
+            nn.Conv2d(channel_in, channel_out, kernel_size=kernel_size, padding=padding),
+            nn.BatchNorm2d(channel_out),
+            nn.ReLU(inplace=True),
+        ]
+
+        if max_pooling:
+            modules.append(nn.MaxPool2d(kernel_size=2))
+            self.size = int(self.size / 2)
+
+        self.model = nn.Sequential(*modules)
+
+    def forward(self,x):
+        return self.model(x)
+
+    def add_next(self, channel_out: int, kernel_size: int = 3, padding: int = 0, max_pooling: bool = False):
+        return HandyNetLayer(self.size, self.channel_out, channel_out, kernel_size=kernel_size, padding=padding, max_pooling=max_pooling)
+
+
+class HandyNet(nn.Module):
     def __init__(self, nb_classes):
         super().__init__()
 
+        conv1 = HandyNetLayer(28, 1, 32)
+        conv2 = conv1.add_next(64, max_pooling=True)
+        conv3 = conv2.add_next(128, padding=1, max_pooling=True)
+        conv4 = conv3.add_next(128, padding=1, max_pooling=True)
+        full1 = nn.Linear(conv4.size ** 2 * conv4.channel_out, 256)
+        full2 = nn.Linear(256, int(nb_classes))
+
         self.model = nn.Sequential(
-            nn.Conv2d(1, 64, kernel_size = 3, padding = 1),
-            nn.BatchNorm2d(64),
+            conv1,
+            conv2,
+            conv3,
+            conv4,
+            nn.Flatten(),
+            full1,
             nn.ReLU(inplace=True),
-            nn.Conv2d(64, 128, kernel_size = 3, padding = 1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size = 2),
-            nn.Conv2d(128, 256, kernel_size = 3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 25, kernel_size = 3),
-            nn.BatchNorm2d(25),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size = 2),
-            nn.AvgPool2d(6),
-            nn.Flatten()
+            full2
         )
 
         self.model.apply(self.__init_weights)
@@ -39,23 +64,6 @@ class Net(nn.Module):
 
     def forward(self,x):
         return self.model(x)
-
-
-class GoogleNet(nn.Module):
-    def __init__(self, nb_classes):
-        super().__init__()
-
-        self.model = googlenet(pretrained=True)
-        dim_before_fc = self.model.fc.in_features
-
-        for param in self.model.parameters():
-                        param.requires_grad = False
-
-        self.model.fc = nn.Linear(dim_before_fc, int(nb_classes))
-
-    def forward(self, x):
-        print(x.shape)
-        return self.model.forward(x)
 
 
 def load_model(filename: str):
