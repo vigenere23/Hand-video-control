@@ -25,7 +25,7 @@ def run():
         x, y, w, h = cv2.boundingRect(points)
 
         image = crop_square_region(capture, points)
-        sign = predict_sign(model, image, threshold=0.4, verbose=True)
+        sign = predict_sign(model, image, threshold=0.5, verbose=True)
         group = find_sign_group(sign)
         
         capture = cv2.rectangle(capture, (x,y), (x+w,y+h), (0,255,0), thickness=2)

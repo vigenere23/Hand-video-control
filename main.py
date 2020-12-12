@@ -27,15 +27,18 @@ def main():
         # Capture image from webcam
         sucess, image = webcam.read()
         capture = cv2.flip(image.copy(), flipCode=1)
+        sign = None
 
         # Return image of just the hand
-        image_hand = segmentation_contour(image)
+        try:
+            image_hand = segmentation_contour(image)
+            cv2.imshow("Image main", image_hand)
+            sign = predict_sign(model, image_hand, threshold=0.9)
+        except Exception as e:
+            print(e)
 
-        # Modify images for the CNN model
-        cv2.imshow("Image main", image_hand)
-        sign = predict_sign(model, image_hand, threshold=0.7)
         group = find_sign_group(sign)
-
+        
         capture = cv2.putText(
             capture,
             f"{sign} {str(group)}",
