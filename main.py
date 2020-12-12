@@ -49,7 +49,7 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         print(group)
-        # vlc_control.run(pred)
+        vlc_control.run(group)
 
         # Delay capture
         time.sleep(DELAY)

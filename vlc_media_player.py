@@ -92,12 +92,12 @@ class VLCController:
         self.media_player = VLCMediaPlayer(url)
         self.last_seen = None
         self.actions_dict = dict(
-            y=Action.PLAY,
+            Y=Action.PLAY,
             peace=Action.PAUSE,
-            B=Action.STOP,
+            opened=Action.STOP,
             F=Action.MUTE,
-            l=Action.VOL_UP,
-            up=Action.VOL_DN
+            L=Action.VOL_UP,
+            pointing_up=Action.VOL_DN
         )
 
     def test_run(self):
