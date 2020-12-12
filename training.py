@@ -147,8 +147,8 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
 
 def run():
     # Parameters
-    n_epochs = 20
-    batch_size = 64
+    n_epochs = 10
+    batch_size = 128
     lr = 0.001
 
     # Loading dataset

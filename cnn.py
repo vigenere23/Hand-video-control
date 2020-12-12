@@ -9,26 +9,25 @@ class Net(nn.Module):
         super().__init__()
 
         self.model = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size = 3),
+            nn.Conv2d(1, 32, kernel_size = 3, padding = 1),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-            nn.Conv2d(32, 64, kernel_size = 3),
+            nn.Conv2d(32, 64, kernel_size = 3, padding = 1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size = 2),
-            nn.Conv2d(64, 128, kernel_size = 3, padding = 1),
+            nn.Conv2d(64, 128, kernel_size = 3),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size = 2),
-            nn.Conv2d(128, 128, kernel_size = 3, padding = 1),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(128, 256, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size = 2),
-            nn.Flatten(),
-            nn.Linear(128 * 3 * 3, 256),
+            nn.Conv2d(256, 25, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(25),
             nn.ReLU(inplace=True),
-            nn.Dropout(p = 0.3),
-            nn.Linear(256, int(nb_classes))
+            nn.AvgPool2d(6),
+            nn.Flatten()
         )
 
         self.model.apply(self.__init_weights)
