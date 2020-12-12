@@ -8,6 +8,8 @@ from testing import predict_sign, find_sign_group
 from segmentation_main import segmentation_contour, getContours, modify_image_format
 from vlc_media_player import VLCController
 
+# Délai en secondes
+DELAY = 1
 
 def main():
     # Contrôle de VLC
@@ -48,7 +50,11 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         print(group)
+
         # vlc_control.run(pred)
+
+        # Delay capture
+        time.sleep(DELAY)
 
 
 if __name__ == "__main__":
