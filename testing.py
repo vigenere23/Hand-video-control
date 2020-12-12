@@ -38,7 +38,7 @@ def predict_sign(model: nn.Module, image: np.ndarray, threshold: float = 0.99, v
     if torch.cuda.is_available():
         image = image.cuda()
 
-    confidence, predicted_index = nn.functional.softmax(model(image)).max(dim=1)
+    confidence, predicted_index = nn.functional.softmax(model(image), dim=1).max(dim=1)
     
     if verbose:
         print(confidence.item())

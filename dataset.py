@@ -41,15 +41,26 @@ def split_dataset(dataset: Dataset, factor: float = 0.5):
     return random_split(dataset, [first_dataset_length, second_dataset_length])
 
 
+class Transform(nn.Module):
+    def __init__(self, transform):
+        self.transform = transform
+
+    def __call__(self, x):
+        return self.transform(x)
+
+
 class TrainSignLanguageDataset():
     def __init__(self):
         self.__images, self.__target = load_dataset("train")
 
         self.transform = nn.Sequential(
-            # TODO normalize?
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
-            transforms.GaussianBlur(3, sigma=(0.1, 0.5))
+            # transforms.Normalize((0.5), (0.5)),
+            # transforms.GaussianBlur(3, sigma=(0.1, 0.5)),
+            transforms.RandomErasing(scale=(0.1, 0.33), ratio=(2./5., 5./2.)),
+            # Transform(transforms.ToPILImage()),
+            # transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
+            # Transform(transforms.ToTensor())
         )
 
     def __len__(self):
@@ -57,8 +68,11 @@ class TrainSignLanguageDataset():
 
     def __getitem__(self, index):
         image = self.__images[index]
-        image = transforms.ToPILImage()(image)
-        image = transforms.ToTensor()(image)
+        # image = transforms.Normalize((0.5), (0.5))(image)
+        image = self.transform(image)
+
+        # cv2.imshow('1', image.numpy()[0])
+        # cv2.waitKey(400)
 
         target = self.__target[index]
 

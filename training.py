@@ -147,16 +147,14 @@ def train(model: nn.Module, train_dataset: Dataset, test_dataset: Dataset, val_d
 
 def run():
     # Parameters
-    n_epochs = 20
-    batch_size = 128
+    n_epochs = 30
+    batch_size = 256
     lr = 0.01
 
     # Loading dataset
     train_dataset = TrainSignLanguageDataset()
     train_dataset, val_dataset = split_dataset(train_dataset, factor=0.9)
     test_dataset = TestSignLanguageDataset()
-
-    # TODO create Dataloader to load in batches
 
     # Creating model
     model = Net(25)
