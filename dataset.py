@@ -58,9 +58,10 @@ class TrainSignLanguageDataset():
             # transforms.Normalize((0.5), (0.5)),
             # transforms.GaussianBlur(3, sigma=(0.1, 0.5)),
             transforms.RandomErasing(scale=(0.1, 0.33), ratio=(2./5., 5./2.)),
-            # Transform(transforms.ToPILImage()),
             # transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
-            # Transform(transforms.ToTensor())
+            Transform(transforms.ToPILImage()),
+            transforms.RandomAffine(10, fillcolor=255),
+            Transform(transforms.ToTensor())
         )
 
     def __len__(self):
