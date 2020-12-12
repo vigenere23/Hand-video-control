@@ -1,11 +1,13 @@
-import cv2
-import torch
 import time
+
+import cv2
 import numpy as np
+import torch
+
 from cnn import load_model
-from image import normalize_image_input, crop_square_region
-from testing import predict_sign, find_sign_group
-from segmentation_main import segmentation_contour, getContours
+from image import crop_square_region, normalize_image_input
+from segmentation_main import getContours, segmentation_contour
+from testing import find_sign_group, predict_sign
 from vlc_media_player import VLCController
 
 # Délai en secondes
