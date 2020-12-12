@@ -12,10 +12,6 @@ def getContours(img, imgContour):
     max_area = np.max(area)
     max_arg = np.argmax(area)
     cnt = contours[max_arg]
-
-    #for cnt in contours:
-    #    area = cv2.contourArea(cnt)
-    #    if area > 200:
     cv2.drawContours(imgContour, cnt, -1, (255,0,0), 3) #-1: draw all contours
     peri = cv2.arcLength(cnt, True)
     approx = cv2.approxPolyDP(cnt, 0.02*peri, True) # Approxime nombre de coins
@@ -43,9 +39,18 @@ def segmentation_contour(img):
     imgBlur = cv2.morphologyEx(imgBlur, cv2.MORPH_CLOSE, (7,7))
     x, y, w, h = 0,0,0,0
     x, y, w, h = getContours(imgBlur, imgContour)
+    if h > w:
+        imgFinal = imgFinal[y:y+h, x:x+h]
+    else:
+        imgFinal = imgFinal[y:y+w, x:x+w]
+    print("Taille image finale {}".format(imgFinal.shape))
+    return imgFinal
 
-    return imgFinal[y:y+h, x:x+w]
-
+##############################################################################################################################
+##############################################################################################################################
+#                                                     TESTS                                                                  #
+##############################################################################################################################
+##############################################################################################################################
 def modify_image_format(img):
     # Pas sûr que c'est la meilleure façon, en parler avec les gars
     Y = img.shape[0]
@@ -54,12 +59,6 @@ def modify_image_format(img):
     imgResize = np.ones([maximum,maximum,3],dtype=np.uint8)*255
     imgResize[0:Y,0:X,0:3] = img
     return imgResize
-
-##############################################################################################################################
-##############################################################################################################################
-#                                                     TESTS                                                                  #
-##############################################################################################################################
-##############################################################################################################################
 
 # Color Detection
 def empty(a):

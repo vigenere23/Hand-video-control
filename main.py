@@ -5,7 +5,7 @@ import numpy as np
 from cnn import load_model
 from image import normalize_image_input, crop_square_region
 from testing import predict_sign, find_sign_group
-from segmentation_main import segmentation_contour, getContours, modify_image_format
+from segmentation_main import segmentation_contour, getContours
 from vlc_media_player import VLCController
 
 
@@ -30,9 +30,8 @@ def main():
         image_hand = segmentation_contour(image)
 
         # Modify images for the CNN model
-        image_resize = modify_image_format(image_hand)
-        cv2.imshow("Image main", image_resize)
-        sign = predict_sign(model, image_resize)
+        cv2.imshow("Image main", image_hand)
+        sign = predict_sign(model, image_hand)
         group = find_sign_group(sign)
 
         capture = cv2.putText(
@@ -48,6 +47,7 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         print(group)
+        time.sleep(0.1)
         # vlc_control.run(pred)
 
 
