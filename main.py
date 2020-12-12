@@ -23,7 +23,7 @@ def main():
     webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # id pour le nombre de pixel I guess
     webcam.set(cv2.CAP_PROP_BRIGHTNESS, 75)  # id pour le brightness
     # Load CNN model
-    model, *_ = load_model("0.9351_Net_1607783575.9996943")
+    model, *_ = load_model("0.9392_HandyNet_1607802541.3999255")
 
     while True:
         # Capture image from webcam
@@ -33,10 +33,10 @@ def main():
 
         # Return image of just the hand
         try:
-            image_hand = segmentation_contour(image)
+            image_hand = segmentation_contour(capture)
             cv2.imshow("Image main", image_hand)
-            print("Taille image: {}".format(image_hand.shape))
-            sign = predict_sign(model, image_hand, threshold=0.9)
+            # print("Taille image: {}".format(image_hand.shape))
+            sign = predict_sign(model, image_hand, threshold=0.7)
         except Exception as e:
             print(e)
 

@@ -8,8 +8,8 @@ import numpy as np
 
 
 LETTER_GROUPS = {
-    'fist': ['A', 'E', 'M', 'N', 'O', 'S', 'X'],
-    'pointing_up': ['U', 'R', 'K', 'D', 'I', 'T'],
+    'fist': ['A', 'E', 'M', 'N', 'O', 'S'],
+    'pointing_up': ['U', 'R', 'K', 'D', 'I', 'T', 'X'],
     'opened': ['B', 'C'],
     'pointing_side': ['G', 'H'],
     'Y': ['Y'],

@@ -8,8 +8,9 @@ from testing import predict_sign, find_sign_group
 
 
 def run():
-    model, *_ = load_model('0.9351_Net_1607783575.9996943')
+    model, *_ = load_model('0.9392_HandyNet_1607802541.3999255')
     cap = cv2.VideoCapture(0)
+    print(model)
 
     while True:
         _, capture = cap.read()
