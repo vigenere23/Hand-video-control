@@ -76,10 +76,10 @@ class VLCMediaPlayer:
         else:
             self._player.audio_set_volume(val)
 
-    def volume_up(self, offset):
+    def volume_up(self, offset=5):
         self.set_volume(self.get_volume() + offset)
 
-    def volume_dn(self, offset):
+    def volume_dn(self, offset=5):
         self.set_volume(self.get_volume() - offset)
 
 
