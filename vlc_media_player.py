@@ -2,8 +2,9 @@ import pafy
 import vlc
 import time
 
+
 class VLCMediaPlayer:
-    """ VLC Media Player
+    """VLC Media Player
     Play a video with VLC, from a YouTube url
     """
 
@@ -14,7 +15,7 @@ class VLCMediaPlayer:
     # FF
     # Rewind
 
-    def __init__(self, url, mode=None):
+    def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s", mode=None):
         self.url = url
         video = pafy.new(self.url).getbest()
         if str(mode).lower() == "terminal":
@@ -54,18 +55,17 @@ class VLCMediaPlayer:
         self._player.next_frame()
 
 
-class VLCController():
-    """ VLC Controller
+class VLCController:
+    """VLC Controller
     Control a VLC Media Player
     """
+
     def __init__(self, url="https://www.youtube.com/watch?v=xtp4msMYi9s"):
         self.media_player = VLCMediaPlayer(url)
 
     def run(self, prediction):
         "Control VLC Media Player accordingly to prediction"
         pass
-
-
 
 
 if __name__ == "__main__":
@@ -84,7 +84,6 @@ if __name__ == "__main__":
             media_player.play()
         elif ans == "m":
             media_player.mute()
-
 
     # while media_player.is_playing():
     #     time.sleep(1)
