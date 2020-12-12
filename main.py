@@ -13,7 +13,7 @@ from vlc_media_player import VLCController
 
 def main():
     # Contrôle de VLC
-    vlc_control = VLCController()
+    vlc_control = VLCController(DELAY=3)
 
     # Use Webcam
     webcam = cv2.VideoCapture(0)  # Seule caméra est celle de l'ordi
