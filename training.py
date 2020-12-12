@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch import nn, optim
 from torch.utils.data import Dataset, DataLoader
-from cnn import Net, GoogleNet, save_model, load_model
+from cnn import HandyNet, save_model, load_model
 from testing import test_realworld_images
 from dataset import load_dataset, split_dataset, TrainSignLanguageDataset, TestSignLanguageDataset
 from barbar import Bar
@@ -157,7 +157,7 @@ def run():
     test_dataset = TestSignLanguageDataset()
 
     # Creating model
-    model = Net(25)
+    model = HandyNet(25)
     # model = GoogleNet(25)
 
     # Creating learning modules
