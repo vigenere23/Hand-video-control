@@ -43,7 +43,7 @@ def segmentation_contour(img):
         imgFinal = imgFinal[y:y+h, x:x+h]
     else:
         imgFinal = imgFinal[y:y+w, x:x+w]
-    print("Taille image finale {}".format(imgFinal.shape))
+    # print("Taille image finale {}".format(imgFinal.shape))
     return imgFinal
 
 ##############################################################################################################################

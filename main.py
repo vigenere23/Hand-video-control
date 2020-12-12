@@ -21,19 +21,19 @@ def main():
     webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # id pour le nombre de pixel I guess
     webcam.set(cv2.CAP_PROP_BRIGHTNESS, 75)  # id pour le brightness
     # Load CNN model
-    model, *_ = load_model("0.954_Net_1607723644.4435968")
+    model, *_ = load_model("0.9351_Net_1607783575.9996943")
 
     while True:
         # Capture image from webcam
         sucess, image = webcam.read()
-        capture = image.copy()
+        capture = cv2.flip(image.copy(), flipCode=1)
 
         # Return image of just the hand
         image_hand = segmentation_contour(image)
 
         # Modify images for the CNN model
         cv2.imshow("Image main", image_hand)
-        sign = predict_sign(model, image_hand)
+        sign = predict_sign(model, image_hand, threshold=0.7)
         group = find_sign_group(sign)
 
         capture = cv2.putText(
