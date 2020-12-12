@@ -48,8 +48,11 @@ def segmentation_contour(img):
 
 def modify_image_format(img):
     # Pas sûr que c'est la meilleure façon, en parler avec les gars
-    minShape = min(img.shape[0],img.shape[1])
-    imgResize = img[0:minShape, 0:minShape]
+    Y = img.shape[0]
+    X = img.shape[1]
+    maximum = max(Y,X)
+    imgResize = np.ones([maximum,maximum,3],dtype=np.uint8)*255
+    imgResize[0:Y,0:X,0:3] = img
     return imgResize
 
 ##############################################################################################################################

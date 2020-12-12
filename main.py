@@ -39,7 +39,7 @@ def main():
         cv2.imshow("Image", capture)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-        vlc_control.run(pred)
+        #vlc_control.run(pred)
 
 
 if __name__ == "__main__":
