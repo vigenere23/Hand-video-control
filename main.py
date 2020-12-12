@@ -11,6 +11,16 @@ from vlc_media_player import VLCController
 # Délai en secondes
 DELAY = 1
 
+def delay():
+    "Time between A and B"
+    b = time.time()
+    if (b - delay.a) > delay.length:
+        delay.a = b
+        delay.process = True
+
+delay.length = DELAY
+delay.a = time.time()
+
 def main():
     # Contrôle de VLC
     vlc_control = VLCController()
@@ -48,8 +58,12 @@ def main():
         cv2.imshow("Image", capture)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-        print(group)
-        vlc_control.run(group)
+
+        # Send command to video
+        delay()
+        if delay.process:
+            vlc_control.run(group)
+        delay.process = False
 
         # Delay capture
         time.sleep(DELAY)
