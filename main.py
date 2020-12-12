@@ -11,15 +11,20 @@ from vlc_media_player import VLCController
 # Délai en secondes
 DELAY = 1
 
+
 def delay():
     "Time between A and B"
     b = time.time()
     if (b - delay.a) > delay.length:
+        delay.results = list()
         delay.a = b
         delay.process = True
 
+
 delay.length = DELAY
 delay.a = time.time()
+delay.results = list()
+
 
 def main():
     # Contrôle de VLC
@@ -61,9 +66,12 @@ def main():
 
         # Send command to video
         delay()
+        delay.results.append(group)
         if delay.process:
-            vlc_control.run(group)
+            command = max(set(delay.results), key=delay.results.count)
+            vlc_control.run(command)
         delay.process = False
+
 
 if __name__ == "__main__":
     main()
