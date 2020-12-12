@@ -26,15 +26,19 @@ class HandyNetLayer(nn.Module):
     def forward(self,x):
         return self.model(x)
 
+    @classmethod
+    def create(constructor, previous_layer, channel_out: int, kernel_size: int = 3, padding: int = 0, max_pooling: bool = False):
+        return constructor(previous_layer.size, previous_layer.channel_out, channel_out, kernel_size=kernel_size, padding=padding, max_pooling=max_pooling)
+
 
 class HandyNet(nn.Module):
     def __init__(self, nb_classes):
         super().__init__()
 
         layer1 = HandyNetLayer(28, 1, 32)
-        layer2 = HandyNetLayer(layer1.size, layer1.channel_out, 64, max_pooling=True)
-        layer3 = HandyNetLayer(layer2.size, layer2.channel_out, 128, padding=1, max_pooling=True)
-        layer4 = HandyNetLayer(layer3.size, layer3.channel_out, 128, padding=1, max_pooling=True)
+        layer2 = HandyNetLayer.create(layer1, 64, max_pooling=True)
+        layer3 = HandyNetLayer.create(layer2, 128, padding=1, max_pooling=True)
+        layer4 = HandyNetLayer.create(layer3, 128, padding=1, max_pooling=True)
 
         self.model = nn.Sequential(
             layer1,
