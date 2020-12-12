@@ -109,7 +109,7 @@ def test_realworld_images(model: nn.Module):
 
 
 def run():
-    model, *_ = load_model('0.8807_Net_1607714720.6292076')
+    model = load_model('0.9392_HandyNet_1607802541.3999255')[0]
     test_realworld_images(model)
 
 

@@ -23,7 +23,7 @@ def main():
     webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # id pour le nombre de pixel I guess
     webcam.set(cv2.CAP_PROP_BRIGHTNESS, 75)  # id pour le brightness
     # Load CNN model
-    model, *_ = load_model("0.9392_HandyNet_1607802541.3999255")
+    model = load_model("0.9392_HandyNet_1607802541.3999255")[0]
 
     while True:
         # Capture image from webcam
