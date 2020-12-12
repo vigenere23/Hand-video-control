@@ -60,7 +60,7 @@ class TrainSignLanguageDataset():
             transforms.RandomErasing(scale=(0.1, 0.33), ratio=(2./5., 5./2.)),
             # transforms.RandomAffine(10, translate=(0.2, 0.2), scale=(0.7, 1.1), fillcolor=255),
             Transform(transforms.ToPILImage()),
-            transforms.RandomAffine(10, fillcolor=255),
+            transforms.RandomAffine(15, translate=(0.1, 0.1), scale=(0.9, 1.1), fillcolor=255),
             Transform(transforms.ToTensor())
         )
 
@@ -69,7 +69,6 @@ class TrainSignLanguageDataset():
 
     def __getitem__(self, index):
         image = self.__images[index]
-        # image = transforms.Normalize((0.5), (0.5))(image)
         image = self.transform(image)
 
         # cv2.imshow('1', image.numpy()[0])
