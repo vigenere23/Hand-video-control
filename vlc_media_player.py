@@ -110,7 +110,7 @@ class VLCController:
         "Decide from prediction"
 
         # Not taking None in acount
-        if prediction is None:
+        if prediction is None or prediction not in self.actions_dict.keys():
             return
 
         # Create decision and keep last_seen in decision variable
@@ -126,7 +126,7 @@ class VLCController:
 
     def action(self, decision):
         """Control VLC Media Player accordingly to decision"""
-        dec_act = self.actions_dict[decision]
+        dec_act = self.actions_dict.get(decision, None)
 
         action_options = {
             Action.PLAY:self.media_player.play,
