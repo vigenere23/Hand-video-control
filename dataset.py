@@ -49,7 +49,7 @@ class Transform(nn.Module):
         return self.transform(x)
 
 
-class TrainSignLanguageDataset():
+class TrainSignLanguageDataset(Dataset):
     def __init__(self):
         self.__images, self.__target = load_dataset("train")
 
@@ -76,15 +76,15 @@ class TrainSignLanguageDataset():
         return image, target
 
 
-class TestSignLanguageDataset():
+class TestSignLanguageDataset(Dataset):
     def __init__(self):
-        self.__images, self.__target = load_dataset("test")
+        self.images, self.target = load_dataset("test")
 
     def __len__(self):
         return self.__target.shape[0]
 
     def __getitem__(self, index):
-        image = self.__images[index]
-        target = self.__target[index]
+        image = self.images[index]
+        target = self.target[index]
 
         return image, target
