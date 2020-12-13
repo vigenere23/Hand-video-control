@@ -12,7 +12,7 @@ def show_confusion_matrix(cm, target_names, title, save_path=None):
   ax.imshow(cm, interpolation='nearest', cmap=plt.get_cmap('Blues'))
 
   tick_marks = np.arange(len(target_names))
-  plt.xticks(tick_marks, target_names, rotation=45)
+  plt.xticks(tick_marks, target_names)
   plt.yticks(tick_marks, target_names)
 
   thresh = cm.max() / 2
